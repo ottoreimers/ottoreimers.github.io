@@ -14,7 +14,14 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  security:
+    uses: ./.github/workflows/security.yml
+    permissions:
+      contents: read
+      security-events: write
+
   build:
+    needs: security
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
