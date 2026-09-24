@@ -1,4 +1,5 @@
 name: Security Scanning
+
 on:
   push:
     branches: [main]
@@ -26,10 +27,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-  - name: Run Gitleaks
+      - name: Run Gitleaks
         uses: gitleaks/gitleaks-action@v2
         env:
-          GITHUB_TOKEN: ${{ secret.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   code-scan:
     name: Static Analysis (CodeQL)
@@ -39,14 +40,12 @@ jobs:
       contents: read
     strategy:
       matrix:
-        language: ['typescript']
-  steps:
-    - uses: actions/checkout@v4
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
-      with:
-        languages: ${{ matrix.language }}
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v3
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
+        language: ['javascript-typescript']
+    steps:
+      - uses: actions/checkout@v4
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
