@@ -136,3 +136,22 @@ address {
 		animation-iteration-count: 1 !important;
 	}
 }
+
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation: none;
+	mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+	animation: theme-sweep 0.7s cubic-bezier(0.77, 0, 0.18, 1);
+}
+
+@keyframes theme-sweep {
+	from {
+		clip-path: inset(0 0 0 100%);
+	}
+	to {
+		clip-path: inset(0 0 0 0);
+	}
+}

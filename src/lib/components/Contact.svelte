@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { ContactLink } from '$lib/content';
 	import Icon from './Icon.svelte';
+	import WaveText from './WaveText.svelte';
 
 	let { name, links, photo }: { name: string; links: ContactLink[]; photo?: string } = $props();
 
@@ -11,6 +12,9 @@
 			.join('')
 			.toUpperCase()
 	);
+
+	// Which links are mid-wave, keyed by href. A wave always finishes before it can restart.
+	let waving: Record<string, boolean> = $state({});
 </script>
 
 <aside class="aside">
@@ -33,9 +37,17 @@
 					href={link.href}
 					target={external ? '_blank' : undefined}
 					rel={external ? 'noopener noreferrer' : undefined}
+					onpointerenter={() => (waving[link.href] = true)}
+					onfocus={() => (waving[link.href] = true)}
 				>
 					<Icon name={link.kind} />
-					<span>{link.label}</span>
+					<span class="label">
+						<WaveText
+							text={link.label}
+							playing={waving[link.href] ?? false}
+							onend={() => (waving[link.href] = false)}
+						/>
+					</span>
 				</a>
 			{/each}
 			<!-- eslint-enable svelte/no-navigation-without-resolve -->
@@ -126,5 +138,10 @@
 
 	a:hover {
 		color: var(--color-fg);
+	}
+
+	/* Anchors the visually hidden text inside WaveText. */
+	.label {
+		position: relative;
 	}
 </style>

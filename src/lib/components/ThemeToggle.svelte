@@ -1,26 +1,40 @@
 <script lang="ts">
+	import { tick } from 'svelte';
 	import Icon from './Icon.svelte';
 
-	// Reads the theme already applied by the inline script in app.html, so the
-	// button matches what the visitor sees. `typeof document` guards the prerender step.
 	let light = $state(
 		typeof document !== 'undefined' && document.documentElement.dataset.theme === 'light'
 	);
 
-	function toggle() {
-		light = !light;
+	function apply(next: boolean) {
+		light = next;
 
-		if (light) {
+		if (next) {
 			document.documentElement.dataset.theme = 'light';
 		} else {
 			delete document.documentElement.dataset.theme;
 		}
 
 		try {
-			localStorage.setItem('theme', light ? 'light' : 'dark');
+			localStorage.setItem('theme', next ? 'light' : 'dark');
 		} catch {
 			// Storage can be unavailable in private windows. The toggle still works for this visit.
 		}
+	}
+
+	function toggle() {
+		const next = !light;
+		const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+		if (!document.startViewTransition || reduceMotion) {
+			apply(next);
+			return;
+		}
+
+		document.startViewTransition(async () => {
+			apply(next);
+			await tick();
+		});
 	}
 </script>
 

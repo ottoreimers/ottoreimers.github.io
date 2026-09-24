@@ -27,3 +27,15 @@ test('shows the photo when one is provided', async () => {
 
 	await expect.element(screen.getByRole('img', { name: 'Otto Reimers' })).toBeVisible();
 });
+
+test('hovering a link plays one wave through its letters', async () => {
+	const screen = await render(Contact, { name: 'Otto Reimers', links });
+
+	const link = screen.getByRole('link', { name: /LinkedIn/ });
+	await link.hover();
+
+	await expect.poll(() => link.element().querySelectorAll('.wave').length).toBe('LinkedIn'.length);
+	await expect
+		.poll(() => link.element().querySelectorAll('.wave').length, { timeout: 3000 })
+		.toBe(0);
+});
